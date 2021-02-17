@@ -116,11 +116,9 @@ public class FilmServiceImpl extends ServiceImpl<FilmMapper, Film> implements Fi
             return null;
         }
         String[] types = req.getFilmType().split(",");
-        String[] performers = req.getFilmPerformer().split(",");
         QueryWrapper<Film> wrapper = new QueryWrapper<>();
         wrapper.orderByDesc("film_show_time");
         wrapper.like("film_type",types[0]);
-        wrapper.like("film_performer",performers[0]);
         Page<Film> filmPage = new Page<>(req.getPageNum(),req.getPageSize());
         Page<Film> page = this.baseMapper.selectPage(filmPage, wrapper);
         return page;
