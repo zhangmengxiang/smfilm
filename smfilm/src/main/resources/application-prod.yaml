@@ -1,0 +1,18 @@
+server:
+  port: 8088
+
+web:
+  domain: http://localhost
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: 123456
+    url: jdbc:mysql://132.232.48.123:3306/shimeng_core?useUnicode=true&characterEncoding=utf8&autoReconnect=true&serverTimezone=GMT%2B8
+    type: com.zaxxer.hikari.HikariDataSource
+
+logging:
+  level:
+    root: info
+    com.douyuehan.doubao: info
