@@ -28,18 +28,22 @@ import java.util.Objects;
 @RestController
 @RequestMapping("/film")
 public class FilmController {
+
     private Logger logger = LoggerFactory.getLogger(ChannelController.class);
+
     @Resource
     private FilmService filmService;
+
     @Resource
     private FilmSourceService filmSourceService;
-    @PostMapping(value="/saveFilm")
+
+    @PostMapping(value = "/saveFilm")
     public BaseResp<String> saveChannel(@RequestBody SaveFilmReq req) {
         BaseResp<String> result = new BaseResp<>(StatusMessage.SUCCESS);
         try {
             filmService.saveFilm(req);
         } catch (Exception e) {
-            logger.error("saveFilm err ",e);
+            logger.error("saveFilm err ", e);
             return result.setStatusMessage(StatusMessage.ERROR);
         }
         return result;
@@ -47,14 +51,15 @@ public class FilmController {
 
     /**
      * 查询影视
+     *
      * @return
      */
-    @PostMapping(value="/queryFilm")
+    @PostMapping(value = "/queryFilm")
     public BaseResp<Film> queryChannel(@RequestBody QueryFilmReq req) {
         BaseResp<Film> result = new BaseResp<>(StatusMessage.SUCCESS);
         try {
-            Page<Film> filmPage= filmService.queryChannel(req);
-            if (Objects.isNull(filmPage)){
+            Page<Film> filmPage = filmService.queryChannel(req);
+            if (Objects.isNull(filmPage)) {
                 return result.setDataList(new ArrayList<>());
             }
             return result.setDataList(filmPage.getRecords()).setTotalCount(filmPage.getTotal());
@@ -63,12 +68,13 @@ public class FilmController {
             return result.setStatusMessage(StatusMessage.ERROR);
         }
     }
-    @PostMapping(value="/queryFilmType")
-    public BaseResp<Film> queryFilmType(@RequestBody QueryFilmTypeReq req){
+
+    @PostMapping(value = "/queryFilmType")
+    public BaseResp<Film> queryFilmType(@RequestBody QueryFilmTypeReq req) {
         BaseResp<Film> result = new BaseResp<>(StatusMessage.SUCCESS);
         try {
-            Page<Film> filmPage= filmService.queryFilmType(req);
-            if (Objects.isNull(filmPage)){
+            Page<Film> filmPage = filmService.queryFilmType(req);
+            if (Objects.isNull(filmPage)) {
                 return result.setDataList(new ArrayList<>());
             }
             return result.setDataList(filmPage.getRecords()).setTotalCount(filmPage.getTotal());
@@ -77,74 +83,79 @@ public class FilmController {
             return result.setStatusMessage(StatusMessage.ERROR);
         }
     }
+
     /**
      * 查询渠道通过id
+     *
      * @return
      */
-    @GetMapping(value="/queryFilmByFid")
+    @GetMapping(value = "/queryFilmByFid")
     public BaseResp<QueryFilmResp> queryFilmByFid(@RequestParam("fid") String fid) {
         BaseResp<QueryFilmResp> result = new BaseResp<>(StatusMessage.SUCCESS);
         try {
-          Film film = filmService.queryFilmByFid(fid);
-          if (Objects.isNull(film)){
-              return result;
-          }
-          QueryFilmResp queryFilmResp = new QueryFilmResp();
-          queryFilmResp.setFid(film.getFid());
-          queryFilmResp.setFilmCountry(film.getFilmCountry());
-          queryFilmResp.setFilmCover(film.getFilmCover());
-          queryFilmResp.setFilmDirector(film.getFilmDirector());
-          queryFilmResp.setFilmInfo(film.getFilmInfo());
-          queryFilmResp.setFilmName(film.getFilmName());
-          queryFilmResp.setFilmPerformer(film.getFilmPerformer());
-          queryFilmResp.setFilmRatings(film.getFilmRatings());
-          queryFilmResp.setFilmShowTime(film.getFilmShowTime());
-          queryFilmResp.setFilmType(film.getFilmType());
+            Film film = filmService.queryFilmByFid(fid);
+            if (Objects.isNull(film)) {
+                return result;
+            }
+            QueryFilmResp queryFilmResp = new QueryFilmResp();
+            queryFilmResp.setFid(film.getFid());
+            queryFilmResp.setFilmCountry(film.getFilmCountry());
+            queryFilmResp.setFilmCover(film.getFilmCover());
+            queryFilmResp.setFilmDirector(film.getFilmDirector());
+            queryFilmResp.setFilmInfo(film.getFilmInfo());
+            queryFilmResp.setFilmName(film.getFilmName());
+            queryFilmResp.setFilmPerformer(film.getFilmPerformer());
+            queryFilmResp.setFilmRatings(film.getFilmRatings());
+            queryFilmResp.setFilmShowTime(film.getFilmShowTime());
+            queryFilmResp.setFilmType(film.getFilmType());
             String filmSources = film.getFilmSource();
-            if (StringUtils.isEmpty(filmSources)){
+            if (StringUtils.isEmpty(filmSources)) {
                 return result.setData(queryFilmResp);
             }
             String[] split = filmSources.replaceAll("\\[|]", "").split(",");
             List<FilmSourceReq> filmSourceReqs = new ArrayList<>();
             for (String s : split) {
-                FilmSource filmSource = filmSourceService.getFilmSource(film.getFid(),s.trim());
+                FilmSource filmSource = filmSourceService.getFilmSource(film.getFid(), s.trim());
                 FilmSourceReq filmSourceReq = new FilmSourceReq();
-                if (Objects.nonNull(filmSource)){
+                if (Objects.nonNull(filmSource)) {
                     filmSourceReq.setSid(s);
                     filmSourceReq.setFilmUrl(filmSource.getFilmUrl());
                     filmSourceReqs.add(filmSourceReq);
                 }
             }
-            queryFilmResp.setFilmSourceReqs( filmSourceReqs );
+            queryFilmResp.setFilmSourceReqs(filmSourceReqs);
             return result.setData(queryFilmResp);
         } catch (Exception e) {
-            logger.error("queryFilmByFid err {}", fid,e);
+            logger.error("queryFilmByFid err {}", fid, e);
             return result.setStatusMessage(StatusMessage.ERROR);
         }
     }
-    @PostMapping(value="/updateFilm")
+
+    @PostMapping(value = "/updateFilm")
     public BaseResp<String> updateFilm(@RequestBody SaveFilmReq req) {
         BaseResp<String> result = new BaseResp<>(StatusMessage.SUCCESS);
         try {
             filmService.updateFilm(req);
         } catch (Exception e) {
-            logger.error("updateFilm err ",e);
+            logger.error("updateFilm err ", e);
             return result.setStatusMessage(StatusMessage.ERROR);
         }
         return result;
     }
+
     /**
      * 查询渠道通过id
+     *
      * @return
      */
-    @GetMapping(value="/delFilm")
+    @GetMapping(value = "/delFilm")
     public BaseResp<Channel> delFilm(@RequestParam("fid") String fid) {
         BaseResp<Channel> result = new BaseResp<>(StatusMessage.SUCCESS);
         try {
             filmService.delFilm(fid);
             return result;
         } catch (Exception e) {
-            logger.error("delFilm err {}", fid,e);
+            logger.error("delFilm err {}", fid, e);
             return result.setStatusMessage(StatusMessage.ERROR);
         }
     }

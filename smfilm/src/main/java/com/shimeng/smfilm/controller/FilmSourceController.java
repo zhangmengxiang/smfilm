@@ -36,12 +36,11 @@ import java.util.regex.Pattern;
 @RequestMapping("/filmSource")
 public class FilmSourceController {
     private Logger logger = LoggerFactory.getLogger(ChannelController.class);
+
     @Resource
     private FilmSourceService filmSourceService;
 
-
-
-    @PostMapping(value="/queryVideoUrl")
+    @PostMapping(value = "/queryVideoUrl")
     public BaseResp<String> queryVideoUrl(@RequestBody QueryVideoUrlReq req) {
         BaseResp<String> result = new BaseResp<>(StatusMessage.SUCCESS);
         CloseableHttpClient httpClient = HttpClientBuilder.create().build();
@@ -89,7 +88,7 @@ public class FilmSourceController {
             //  String resultUrl = HttpRequestClient.getInstance().doGet(url, null, null);
             return result.setData(url);
         } catch (Exception e) {
-            logger.error("saveFilm err ",e);
+            logger.error("saveFilm err ", e);
             return result.setStatusMessage(StatusMessage.ERROR);
         }
 
@@ -97,9 +96,10 @@ public class FilmSourceController {
 
     /**
      * 获取指定HTML标签的指定属性的值
-     * @param source 要匹配的源文本
+     *
+     * @param source  要匹配的源文本
      * @param element 标签名称
-     * @param attr 标签的属性名称
+     * @param attr    标签的属性名称
      * @return 属性值列表
      */
     public static List<String> match(String source, String element, String attr) {
