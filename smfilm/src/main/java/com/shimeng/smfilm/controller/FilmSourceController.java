@@ -47,7 +47,7 @@ public class FilmSourceController {
         CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 
         try {
-            FilmSource filmSource = filmSourceService.getFilmSource(req.getFid(), req.getSid());
+            FilmSource filmSource = filmSourceService.getFilmSource(req.getFid(), req.getSid().trim());
             String url = req.getChannelUrl() + filmSource.getFilmUrl();
             HttpGet httpGet = new HttpGet(url);
             CloseableHttpResponse response = null;

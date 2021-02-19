@@ -107,7 +107,7 @@ public class FilmController {
             String[] split = filmSources.replaceAll("\\[|]", "").split(",");
             List<FilmSourceReq> filmSourceReqs = new ArrayList<>();
             for (String s : split) {
-                FilmSource filmSource = filmSourceService.getFilmSource(film.getFid(),s);
+                FilmSource filmSource = filmSourceService.getFilmSource(film.getFid(),s.trim());
                 FilmSourceReq filmSourceReq = new FilmSourceReq();
                 if (Objects.nonNull(filmSource)){
                     filmSourceReq.setSid(s);
