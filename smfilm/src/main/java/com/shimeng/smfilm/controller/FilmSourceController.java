@@ -1,10 +1,12 @@
 package com.shimeng.smfilm.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.shimeng.smfilm.common.BaseResp;
 import com.shimeng.smfilm.common.StatusMessage;
 import com.shimeng.smfilm.model.entity.FilmSource;
 import com.shimeng.smfilm.model.req.QueryFilmTypeReq;
 import com.shimeng.smfilm.model.req.QueryVideoUrlReq;
+import com.shimeng.smfilm.model.resp.MuObject;
 import com.shimeng.smfilm.service.FilmSourceService;
 import org.apache.http.HttpEntity;
 import org.apache.http.ParseException;
@@ -27,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -41,10 +44,10 @@ public class FilmSourceController {
     private FilmSourceService filmSourceService;
 
     @PostMapping(value = "/queryVideoUrl")
-    public BaseResp<String> queryVideoUrl(@RequestBody QueryVideoUrlReq req) {
-        BaseResp<String> result = new BaseResp<>(StatusMessage.SUCCESS);
+    public BaseResp<MuObject> queryVideoUrl(@RequestBody QueryVideoUrlReq req) {
+        BaseResp<MuObject> result = new BaseResp<>(StatusMessage.SUCCESS);
         CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-
+        MuObject muObject = null;
         try {
             FilmSource filmSource = filmSourceService.getFilmSource(req.getFid(), req.getSid().trim());
             String url = req.getChannelUrl() + filmSource.getFilmUrl();
@@ -59,11 +62,20 @@ public class FilmSourceController {
                 System.out.println("响应状态为:" + response.getStatusLine());
                 if (responseEntity != null) {
                     System.out.println("响应内容长度为:" + responseEntity.getContentLength());
+                    long contentLength = responseEntity.getContentLength();
                     String source = EntityUtils.toString(responseEntity);
                     System.out.println("响应内容为:" + source);
-                    List<String> list = match(source, "iframe", "src");
-                    String[] split = list.get(0).split("=");
-                    url = split[1];
+
+                    // 为-1 则返回为html版
+                    if (contentLength == -1){
+                        List<String> list = match(source, "iframe", "src");
+                        String[] split = list.get(0).split("=");
+                        muObject = new MuObject();
+                        muObject.setUrl(split[1]);
+                        muObject.setType("m3u8");
+                    } else {
+                        muObject = JSONObject.parseObject(source, MuObject.class);
+                    }
                 }
 
             } catch (ClientProtocolException e) {
@@ -86,7 +98,7 @@ public class FilmSourceController {
                 }
             }
             //  String resultUrl = HttpRequestClient.getInstance().doGet(url, null, null);
-            return result.setData(url);
+            return result.setData(muObject);
         } catch (Exception e) {
             logger.error("saveFilm err ", e);
             return result.setStatusMessage(StatusMessage.ERROR);
